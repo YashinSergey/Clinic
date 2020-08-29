@@ -11,7 +11,7 @@ class ClinicRetrofit {
 
 
     companion object {
-        private val BASE_URL = "https://petclinic-app.herokuapp.com"
+        private val BASE_URL = "http://194.87.111.66:8080/v2/api-docs/"
 
         fun getRetrofit() = Retrofit.Builder()
             .baseUrl(BASE_URL)

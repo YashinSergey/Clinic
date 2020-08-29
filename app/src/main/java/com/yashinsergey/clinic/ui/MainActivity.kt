@@ -2,7 +2,6 @@ package com.yashinsergey.clinic.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.Observer
 import com.yashinsergey.clinic.R
 import com.yashinsergey.clinic.common.logD
