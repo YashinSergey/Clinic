@@ -6,5 +6,6 @@ data class Doctor (
     val experienceYears: Int,
     val name: String,
     val specialization: String,
-    val surname: String
+    val surname: String,
+    val position: String
 )

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="item"
+            type="com.yashinsergey.clinic.model.repos.network.json.Doctor" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="130dp"
+        android:layout_height="160dp"
+        android:background="@drawable/bg_doctor_item">
+
+        <ImageView
+            android:id="@+id/item_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/doctor_with_a_dog"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="@id/name"
+            android:background="@color/zircon"
+            android:alpha="0.5"/>
+
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/item_image"
+            app:layout_constraintBottom_toTopOf="@+id/position"
+            android:layout_marginStart="10dp"
+            android:textColor="@android:color/black"
+            android:textSize="12sp"
+            android:text="@{item.name}"
+            tools:text="Сидорова Татьяна Олеговна"/>
+
+        <TextView
+            android:id="@+id/position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/item_image"
+            app:layout_constraintStart_toStartOf="@id/item_image"
+            android:layout_marginStart="10dp"
+            android:textSize="8sp"
+            android:text="@{item.position}"
+            tools:text="Заведующая отделением"
+            tools:ignore="SmallSp"
+            android:layout_marginBottom="5dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
