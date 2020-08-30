@@ -6,7 +6,7 @@ import com.squareup.picasso.Picasso
 import com.yashinsergey.clinic.BuildConfig
 
 fun loadImage(picUrl: String, view: ImageView) {
-    Picasso.get().load(picUrl).fit().into(view)
+    Picasso.get().load(picUrl).into(view)
 }
 
 fun logD(message: String, tag: String = "CLINIC_APP") {
