@@ -2,14 +2,17 @@ package com.yashinsergey.clinic.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import com.yashinsergey.clinic.R
+import com.yashinsergey.clinic.common.FragmentExtensions
 import com.yashinsergey.clinic.common.logD
 import com.yashinsergey.clinic.common.logE
 import com.yashinsergey.clinic.viewmodel.DoctorsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FragmentExtensions {
 
     private val viewModel: DoctorsViewModel by viewModel()
 
@@ -21,11 +24,18 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.doctorListResult.observe(this, Observer {
             if (it.isSuccess) {
-                it.getOrNull()?.forEach { logD("$it") }
+                it.getOrNull()?.let { data ->
+                    val doctorListFragment = DoctorListFragment(data)
+                    display(doctorListFragment)
+                }
+
             } else {
                 logE("${it.exceptionOrNull()?.message}")
             }
         })
+    }
 
+    fun display(fragment: Fragment) {
+        supportFragmentManager.display(R.id.main_container, fragment, FragmentTransaction.TRANSIT_NONE)
     }
 }
