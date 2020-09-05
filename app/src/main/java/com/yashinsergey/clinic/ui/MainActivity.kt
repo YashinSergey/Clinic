@@ -16,6 +16,8 @@ class MainActivity : AppCompatActivity(), FragmentExtensions {
 
     private val viewModel: DoctorsViewModel by viewModel()
 
+    private val doctorListFragment = DoctorListFragment()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -25,7 +27,7 @@ class MainActivity : AppCompatActivity(), FragmentExtensions {
         viewModel.doctorListResult.observe(this, Observer {
             if (it.isSuccess) {
                 it.getOrNull()?.let { data ->
-                    val doctorListFragment = DoctorListFragment(data)
+                    doctorListFragment.doctorListSubject.onNext(data)
                     display(doctorListFragment)
                 }
 
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity(), FragmentExtensions {
         })
     }
 
-    fun display(fragment: Fragment) {
+    private fun display(fragment: Fragment) {
         supportFragmentManager.display(R.id.main_container, fragment, FragmentTransaction.TRANSIT_NONE)
     }
 }
