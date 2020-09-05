@@ -9,9 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import com.yashinsergey.clinic.common.logD
 import com.yashinsergey.clinic.databinding.FragmentDoctorsListBinding
-import com.yashinsergey.clinic.databinding.RecyclerViewDoctorsBinding
+import com.yashinsergey.clinic.databinding.ItemDoctorsListBinding
 import com.yashinsergey.clinic.model.data.BranchId
 import com.yashinsergey.clinic.model.repos.network.json.Doctor
 import com.yashinsergey.clinic.ui.common.LazyContainer
@@ -34,31 +33,32 @@ class DoctorListFragment: Fragment() {
     private val intensiveCareUnitList = mutableListOf<Doctor>()
 
     private val doctorListConsumer = Consumer<List<Doctor>> {
-        binding.recyclerViewsLayout.removeAllViews()
-        therapyList.clear()
-        surgeryList.clear()
-        intensiveCareUnitList.clear()
+        clearPage()
+
         it.forEach { doctor ->
-            logD("${doctor.name}: branch id is ${doctor.branch.id}, branch name is ${doctor.branch.name}")
-            when(doctor.branch.id)  {
+            when (doctor.branch.id) {
                 BranchId.THERAPY.id -> therapyList.add(doctor)
                 BranchId.SURGERY.id -> surgeryList.add(doctor)
                 BranchId.INTENSIVE_CARE_UNIT.id -> intensiveCareUnitList.add(doctor)
             }
+        }
 
-            val therapyView = therapyList.createDoctorsList(inflater, container, therapyAdapter)
-            val surgeryView = surgeryList.createDoctorsList(inflater, container, surgeryAdapter)
-            val intensiveCareUnitView = intensiveCareUnitList.createDoctorsList(inflater, container, intensiveCareUnitAdapter)
+        val therapyView = therapyList.createRecyclerView(inflater, container, therapyAdapter)
+        val surgeryView = surgeryList.createRecyclerView(inflater, container, surgeryAdapter)
+        val intensiveCareUnitView = intensiveCareUnitList.createRecyclerView(inflater, container, intensiveCareUnitAdapter)
 
-            with(binding.recyclerViewsLayout) {
-                addView(therapyView)
-                addView(surgeryView)
-                addView(intensiveCareUnitView)
-            }
+        with(binding.recyclerViewsLayout) {
+            addView(therapyView)
+            addView(surgeryView)
+            addView(intensiveCareUnitView)
         }
     }
-    private fun clearList(list: MutableList<Doctor>) {
-        list.clear()
+
+    private fun clearPage() {
+        binding.recyclerViewsLayout.removeAllViews()
+        therapyList.clear()
+        surgeryList.clear()
+        intensiveCareUnitList.clear()
     }
 
     private val therapyAdapter : GroupAdapter<GroupieViewHolder> by lazy {
@@ -109,8 +109,9 @@ class DoctorListFragment: Fragment() {
         return groups
     }
 
-    private fun List<Doctor>.createDoctorsList(layoutInflater: LayoutInflater, container: ViewGroup?, adapter: GroupAdapter<GroupieViewHolder>): View {
-        val itemBinding = RecyclerViewDoctorsBinding.inflate(layoutInflater, container, false)
+    private fun List<Doctor>.createRecyclerView(layoutInflater: LayoutInflater, container: ViewGroup?, adapter: GroupAdapter<GroupieViewHolder>): View {
+        val itemBinding = ItemDoctorsListBinding.inflate(layoutInflater, container, false)
+        itemBinding.branch.text = this[0].branch.name
         itemBinding.doctorsRecycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         itemBinding.doctorsRecycler.adapter = adapter
         fillAdapter(adapter, this)

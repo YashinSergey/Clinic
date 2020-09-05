@@ -7,8 +7,8 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import com.yashinsergey.clinic.R
 import com.yashinsergey.clinic.common.FragmentExtensions
-import com.yashinsergey.clinic.common.logD
 import com.yashinsergey.clinic.common.logE
+import com.yashinsergey.clinic.model.data.BranchId
 import com.yashinsergey.clinic.viewmodel.DoctorsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(), FragmentExtensions {
 
         viewModel.getDoctorsList()
 
-        viewModel.doctorListResult.observe(this, Observer {
+        viewModel.allDoctorListResult.observe(this, Observer {
             if (it.isSuccess) {
                 it.getOrNull()?.let { data ->
                     doctorListFragment.doctorListSubject.onNext(data)

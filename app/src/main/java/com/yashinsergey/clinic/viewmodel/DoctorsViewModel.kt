@@ -10,8 +10,11 @@ class DoctorsViewModel(private val repos: DoctorsRepository): ViewModel() {
 
 
 
-    val doctorListResult = MutableLiveData<Result<List<Doctor>>>()
+    val allDoctorListResult = MutableLiveData<Result<List<Doctor>>>()
+    val doctorsByBranchResult = MutableLiveData<Result<List<Doctor>>>()
 
-    fun getDoctorsList() = launchInScope({ repos.getDoctorList() }, doctorListResult)
+    fun getDoctorsList() = launchInScope({ repos.getDoctorList() }, allDoctorListResult)
+
+    fun getDoctorListByBranch(branchId: Int) = launchInScope({repos.getDoctorListByBranch(branchId)}, doctorsByBranchResult)
 
 }
