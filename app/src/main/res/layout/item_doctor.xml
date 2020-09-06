@@ -12,22 +12,25 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="130dp"
         android:layout_height="160dp"
-        android:background="@drawable/bg_doctor_item">
+        android:background="@drawable/bg_1_doctor_item"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
 
         <ImageView
             android:id="@+id/item_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/doctor_with_a_dog"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="@id/name"
-            android:background="@color/zircon"
+            android:background="@drawable/bg_2_doctor_item"
             android:alpha="0.5"/>
 
 
@@ -51,9 +54,18 @@
             app:layout_constraintStart_toStartOf="@id/item_image"
             android:layout_marginStart="10dp"
             android:textSize="8sp"
-            android:text="@{item.position}"
+            android:text="@{item.specialization}"
             tools:text="Заведующая отделением"
             tools:ignore="SmallSp"
             android:layout_marginBottom="5dp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="@id/name"
+            android:background="@drawable/bg_ripple_1"
+            android:clickable="true"
+            android:focusable="true"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
