@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        
+        <CalendarView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:selectedWeekBackgroundColor="#ff0000"
+            android:weekNumberColor="#0000ff"
+            android:weekSeparatorLineColor="#00ff00"
+            android:focusedMonthDateColor="#ff0000"
+            android:unfocusedMonthDateColor="@android:color/holo_orange_light" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
