@@ -17,6 +17,7 @@ import com.yashinsergey.clinic.ui.common.LazyContainer
 import com.yashinsergey.clinic.ui.views.DoctorViewItem
 import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 
 class DoctorListFragment: Fragment() {
 
@@ -25,6 +26,7 @@ class DoctorListFragment: Fragment() {
 
     private lateinit var inflater: LayoutInflater
     private var container: ViewGroup? = null
+    val click = PublishSubject.create<ButtonId>()
 
     val doctorListSubject = BehaviorSubject.create<List<Doctor>>()
 
@@ -104,7 +106,7 @@ class DoctorListFragment: Fragment() {
     private fun createGroups(list: List<Doctor>): List<DoctorViewItem> {
         val groups = mutableListOf<DoctorViewItem>()
         list.forEachIndexed { i, data ->
-            groups.add(DoctorViewItem(i.toLong(),data))
+            groups.add(DoctorViewItem(i.toLong(), data, click))
         }
         return groups
     }

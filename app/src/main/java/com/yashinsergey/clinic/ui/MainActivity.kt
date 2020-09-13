@@ -1,5 +1,6 @@
 package com.yashinsergey.clinic.ui
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,8 +9,8 @@ import androidx.lifecycle.Observer
 import com.yashinsergey.clinic.R
 import com.yashinsergey.clinic.common.FragmentExtensions
 import com.yashinsergey.clinic.common.logE
-import com.yashinsergey.clinic.model.data.BranchId
 import com.yashinsergey.clinic.viewmodel.DoctorsViewModel
+import io.reactivex.functions.Consumer
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), FragmentExtensions {
@@ -17,7 +18,15 @@ class MainActivity : AppCompatActivity(), FragmentExtensions {
     private val viewModel: DoctorsViewModel by viewModel()
 
     private val doctorListFragment = DoctorListFragment()
+    private val calendarFragment = CalendarFragment()
 
+    private val clickConsumer = Consumer<ButtonId> { id ->
+        when (id!!) {
+            ButtonId.CALENDAR -> display(calendarFragment)
+        }
+    }
+
+    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,6 +44,8 @@ class MainActivity : AppCompatActivity(), FragmentExtensions {
                 logE("${it.exceptionOrNull()?.message}")
             }
         })
+
+        doctorListFragment.click.subscribe(clickConsumer)
     }
 
     private fun display(fragment: Fragment) {
