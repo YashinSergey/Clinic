@@ -6,7 +6,7 @@ import com.yashinsergey.clinic.common.launchInScope
 import com.yashinsergey.clinic.model.repos.DoctorsRepository
 import com.yashinsergey.clinic.model.repos.network.json.Doctor
 
-class DoctorsViewModel(private val repos: DoctorsRepository): ViewModel() {
+class DoctorsListFragmentViewModel(private val repos: DoctorsRepository): ViewModel() {
 
 
 
