@@ -62,8 +62,6 @@ class CalendarFragment: Fragment() {
         binding.calendar.minDate = System.currentTimeMillis()
         binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
             doctor?.let { doctor ->
-//                val date = Calendar.getInstance()
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd")
                 val date = "$year-$month-$dayOfMonth"
                 calendarViewModel.getAppointmentsTimes(doctor.id, date)
             }
