@@ -4,11 +4,10 @@ import com.yashinsergey.clinic.model.repos.DoctorsRepository
 import com.yashinsergey.clinic.model.repos.network.DoctorsRepositoryImpl
 import com.yashinsergey.clinic.model.repos.network.api.DoctorsApi
 import com.yashinsergey.clinic.model.repos.network.retrofit.ClinicRetrofit
-import com.yashinsergey.clinic.viewmodel.DoctorsViewModel
+import com.yashinsergey.clinic.viewmodel.DoctorsListFragmentViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
-import retrofit2.create
 
 val appModule = module {
 
@@ -18,6 +17,6 @@ val appModule = module {
 
     single<DoctorsRepository> { DoctorsRepositoryImpl(get())}
 
-    viewModel { DoctorsViewModel(get()) }
+    viewModel { DoctorsListFragmentViewModel(get()) }
 
 }

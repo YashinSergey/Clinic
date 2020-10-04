@@ -6,9 +6,9 @@ import com.yashinsergey.clinic.common.loadImage
 import com.yashinsergey.clinic.databinding.ItemDoctorBinding
 import com.yashinsergey.clinic.model.repos.network.json.Doctor
 import com.yashinsergey.clinic.ui.ButtonId
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.Observer
 
-class DoctorViewItem(id: Long, private val doctor: Doctor, val clickSubject: PublishSubject<ButtonId>): BindableItem<ItemDoctorBinding>(id) {
+class DoctorViewItem(id: Long, private val doctor: Doctor, private val clickSubject: Observer<ButtonId>): BindableItem<ItemDoctorBinding>(id) {
 
     override fun getLayout(): Int = R.layout.item_doctor
 
