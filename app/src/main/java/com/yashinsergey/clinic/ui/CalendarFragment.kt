@@ -1,20 +1,45 @@
 package com.yashinsergey.clinic.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
 import com.yashinsergey.clinic.common.logD
+import com.yashinsergey.clinic.common.logE
 import com.yashinsergey.clinic.databinding.FragmentCalendarBinding
+import com.yashinsergey.clinic.model.repos.network.json.AppointmentDay
+import com.yashinsergey.clinic.model.repos.network.json.Doctor
+import com.yashinsergey.clinic.model.repos.network.json.Receptions
 import com.yashinsergey.clinic.ui.common.LazyContainer
+import com.yashinsergey.clinic.ui.views.AppointmentTimeItem
+import com.yashinsergey.clinic.viewmodel.CalendarFragmentViewModel
+import io.reactivex.functions.Consumer
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import java.util.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
 
 class CalendarFragment: Fragment() {
 
+    private val calendarViewModel: CalendarFragmentViewModel by viewModel()
+
     private val lazyContainer = LazyContainer<FragmentCalendarBinding>()
     private val click = PublishSubject.create<ButtonId>()
+
+    val doctorSubject = BehaviorSubject.create<Doctor>()
+    var doctor: Doctor? = null
+    val doctorConsumer = Consumer<Doctor> { doctor = it }
+
+    val adapter : GroupAdapter<GroupieViewHolder> by lazy {
+        val groupAdapter = GroupAdapter<GroupieViewHolder>()
+        groupAdapter.setHasStableIds(true)
+        groupAdapter
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         lazyContainer.getValue(
@@ -23,14 +48,54 @@ class CalendarFragment: Fragment() {
         ).root
 
 
+    @SuppressLint("CheckResult")
     private fun initFragmentViews(binding: FragmentCalendarBinding) {
-        binding.calendar.minDate = System.currentTimeMillis()
-        val currentTime = Calendar.getInstance().time
-        logD("currentTime: $currentTime")
-        binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            logD("date: ${view.date}")
-            logD("formatted date: ${month+1}/$dayOfMonth/$year")
+        initCalendar(binding)
+        binding.timeRecyclerView.layoutManager = GridLayoutManager(context, 4)
+        binding.timeRecyclerView.adapter = adapter
+        doctorSubject.subscribe(doctorConsumer)
+        viewModelConnect(binding)
+    }
 
+    @SuppressLint("SimpleDateFormat")
+    private fun initCalendar(binding: FragmentCalendarBinding) {
+        binding.calendar.minDate = System.currentTimeMillis()
+        binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
+            doctor?.let { doctor ->
+//                val date = Calendar.getInstance()
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+                val date = "$year-$month-$dayOfMonth"
+                calendarViewModel.getAppointmentsTimes(doctor.id, date)
+            }
         }
+    }
+
+    private fun viewModelConnect(binding: FragmentCalendarBinding) {
+        calendarViewModel.appointmentsTimesResult.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            if (it.isSuccess) {
+                it.getOrNull()?.let { data ->
+                    logD("$data","AppointmentDataCheck")
+                    appointmentDayConsumer.accept(Pair(data, binding))
+                }
+            } else {
+                logE("${it.exceptionOrNull()?.message}", "AppointmentDataCheck")
+                adapter.clear()
+                binding.selectedDate.text = ""
+            }
+        })
+    }
+
+    private val appointmentDayConsumer = Consumer<Pair<AppointmentDay, FragmentCalendarBinding>> {
+        adapter.clear()
+        it.second.selectedDate.text = it.first.date
+        adapter.addAll(createGroups(it.first.receptions))
+    }
+
+    private fun createGroups(receptions: List<Receptions>): List<AppointmentTimeItem> {
+        val groups = mutableListOf<AppointmentTimeItem>()
+        receptions.forEachIndexed { i, reception ->
+            groups.add(AppointmentTimeItem(i.toLong(), reception))
+        }
+        return groups
     }
 }

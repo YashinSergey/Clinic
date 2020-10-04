@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity(), FragmentExtensions {
         display(doctorsListFragment)
 
         doctorsListFragment.click.subscribe(clickConsumer)
+        doctorsListFragment.doctorSubject.subscribe(calendarFragment.doctorSubject)
     }
 
     private fun display(fragment: Fragment) {
