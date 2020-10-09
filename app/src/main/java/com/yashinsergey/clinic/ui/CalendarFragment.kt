@@ -11,6 +11,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.yashinsergey.clinic.common.logD
 import com.yashinsergey.clinic.common.logE
+import com.yashinsergey.clinic.common.toStringDate
 import com.yashinsergey.clinic.databinding.FragmentCalendarBinding
 import com.yashinsergey.clinic.model.repos.network.json.AppointmentDay
 import com.yashinsergey.clinic.model.repos.network.json.Doctor
@@ -22,7 +23,7 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.text.SimpleDateFormat
+import java.util.*
 
 class CalendarFragment: Fragment() {
 
@@ -62,11 +63,24 @@ class CalendarFragment: Fragment() {
         binding.calendar.minDate = System.currentTimeMillis()
         binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
             doctor?.let { doctor ->
-                val date = "$year-$month-$dayOfMonth"
-                calendarViewModel.getAppointmentsTimes(doctor.id, date)
+//                val date = "$year-$month-$dayOfMonth"
+                calendarViewModel.getAppointmentsTimes(doctor.id, view.date.toStringDate())
             }
         }
     }
+
+//    private fun initFragmentViews(binding: FragmentCalendarBinding) {
+//        binding.calendar.minDate = System.currentTimeMillis()
+//        val currentTime = Calendar.getInstance().time
+//        logD("currentTime: $currentTime")
+//        binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
+//            logD("date: ${view.date}")
+////            logD("formatted date: ${month+1}/$dayOfMonth/$year")
+//            logD("formatted date: ${view.date.toStringDate()}")
+//
+//
+//        }
+//    }
 
     private fun viewModelConnect(binding: FragmentCalendarBinding) {
         calendarViewModel.appointmentsTimesResult.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
