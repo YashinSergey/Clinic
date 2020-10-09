@@ -12,9 +12,8 @@ import com.yashinsergey.clinic.model.repos.network.json.Doctor
 import com.yashinsergey.clinic.ui.ButtonId
 import com.yashinsergey.clinic.ui.views.DoctorViewItem
 import io.reactivex.Observer
-import io.reactivex.subjects.PublishSubject
 
-class DoctorsListsAdapters(val context: Context) {
+class DoctorsListsAdapters(private val context: Context) {
 
     val therapyAdapter : GroupAdapter<GroupieViewHolder> by lazy {
         val groupAdapter = GroupAdapter<GroupieViewHolder>()
@@ -34,28 +33,39 @@ class DoctorsListsAdapters(val context: Context) {
         groupAdapter
     }
 
-    fun createGroups(list: List<Doctor>, click: Observer<ButtonId>): List<DoctorViewItem> {
+    private fun createGroups(list: List<Doctor>, click: Observer<ButtonId>, doctorObserver: Observer<Doctor>): List<DoctorViewItem> {
         val groups = mutableListOf<DoctorViewItem>()
         list.forEachIndexed { i, data ->
-            groups.add(DoctorViewItem(i.toLong(), data, click))
+            groups.add(DoctorViewItem(i.toLong(), data, click, doctorObserver))
         }
         return groups
     }
 
-    fun initRecyclerView(layoutInflater: LayoutInflater, container: ViewGroup?,
-                                                         adapter: GroupAdapter<GroupieViewHolder>,
-                         doctorsList: List<Doctor>, click: Observer<ButtonId>): View {
+    fun initRecyclerView(
+        layoutInflater: LayoutInflater,
+        container: ViewGroup?,
+        adapter: GroupAdapter<GroupieViewHolder>,
+        doctorsList: List<Doctor>,
+        click: Observer<ButtonId>,
+        doctorObserver: Observer<Doctor>
+    ): View {
         val itemBinding = ItemDoctorsListBinding.inflate(layoutInflater, container, false)
         itemBinding.branch.text = doctorsList[0].branch.name
-        itemBinding.doctorsRecycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        itemBinding.doctorsRecycler.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         itemBinding.doctorsRecycler.adapter = adapter
-        fillAdapter(adapter,  click, doctorsList)
+        fillAdapter(adapter, click, doctorsList, doctorObserver)
         return itemBinding.root
     }
 
-    private fun fillAdapter(adapter: GroupAdapter<GroupieViewHolder>, click: Observer<ButtonId>, list: List<Doctor>) {
-        if(adapter.groupCount > 0) adapter.clear()
-        adapter.addAll(createGroups(list, click))
+    private fun fillAdapter(
+        adapter: GroupAdapter<GroupieViewHolder>,
+        click: Observer<ButtonId>,
+        list: List<Doctor>,
+        doctorObserver: Observer<Doctor>
+    ) {
+        if (adapter.groupCount > 0) adapter.clear()
+        adapter.addAll(createGroups(list, click, doctorObserver))
         adapter.notifyDataSetChanged()
     }
 }

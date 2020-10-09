@@ -1,6 +1,5 @@
-package com.yashinsergey.clinic.model.repos.network
+package com.yashinsergey.clinic.model.repos
 
-import com.yashinsergey.clinic.model.repos.DoctorsRepository
 import com.yashinsergey.clinic.model.repos.network.api.DoctorsApi
 import com.yashinsergey.clinic.model.repos.network.json.Branch
 import com.yashinsergey.clinic.model.repos.network.json.Doctor

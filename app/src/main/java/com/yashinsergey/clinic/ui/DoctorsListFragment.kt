@@ -24,6 +24,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class DoctorsListFragment: Fragment() {
 
     private val doctorsViewModel: DoctorsListFragmentViewModel by viewModel()
+
     private val lazyContainer = LazyContainer<FragmentDoctorsListBinding>()
     private lateinit var binding: FragmentDoctorsListBinding
 
@@ -32,6 +33,7 @@ class DoctorsListFragment: Fragment() {
     val click = PublishSubject.create<ButtonId>()
 
     val doctorListSubject = BehaviorSubject.create<List<Doctor>>()
+    val doctorSubject = PublishSubject.create<Doctor>()
 
     private val therapyList = mutableListOf<Doctor>()
     private val surgeryList = mutableListOf<Doctor>()
@@ -60,7 +62,7 @@ class DoctorsListFragment: Fragment() {
     }
 
     private fun initView(adapter: GroupAdapter<GroupieViewHolder>, doctorsList: List<Doctor>): View =
-        adapters.initRecyclerView(inflater, container, adapter, doctorsList, click)
+        adapters.initRecyclerView(inflater, container, adapter, doctorsList, click, doctorSubject)
 
     private fun clearPage() {
         binding.recyclerViewsLayout.removeAllViews()
@@ -77,8 +79,7 @@ class DoctorsListFragment: Fragment() {
                 viewModelConnect()
             }
         ).root
-
-
+    
     @SuppressLint("CheckResult")
     private fun initFragmentViews(binding: FragmentDoctorsListBinding, inflater: LayoutInflater, container: ViewGroup?) {
         this.inflater = inflater
