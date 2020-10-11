@@ -23,7 +23,7 @@
             android:textColor="@android:color/black"
             android:padding="10dp"
             android:textSize="18sp"
-            android:text="@{item.beginTime}"
+            android:text="@{item.getTime(item.beginTime)}"
             tools:text="15:38"/>
 
     </FrameLayout>

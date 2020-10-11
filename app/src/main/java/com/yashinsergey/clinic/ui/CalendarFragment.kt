@@ -9,9 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import com.yashinsergey.clinic.common.logD
-import com.yashinsergey.clinic.common.logE
-import com.yashinsergey.clinic.common.toStringDate
 import com.yashinsergey.clinic.databinding.FragmentCalendarBinding
 import com.yashinsergey.clinic.model.repos.network.json.AppointmentDay
 import com.yashinsergey.clinic.model.repos.network.json.Doctor
@@ -23,7 +20,6 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
 
 class CalendarFragment: Fragment() {
 
@@ -34,9 +30,9 @@ class CalendarFragment: Fragment() {
 
     val doctorSubject = BehaviorSubject.create<Doctor>()
     var doctor: Doctor? = null
-    val doctorConsumer = Consumer<Doctor> { doctor = it }
+    private val doctorConsumer = Consumer<Doctor> { doctor = it }
 
-    val adapter : GroupAdapter<GroupieViewHolder> by lazy {
+    private val adapter : GroupAdapter<GroupieViewHolder> by lazy {
         val groupAdapter = GroupAdapter<GroupieViewHolder>()
         groupAdapter.setHasStableIds(true)
         groupAdapter
@@ -61,36 +57,21 @@ class CalendarFragment: Fragment() {
     @SuppressLint("SimpleDateFormat")
     private fun initCalendar(binding: FragmentCalendarBinding) {
         binding.calendar.minDate = System.currentTimeMillis()
-        binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
+        binding.calendar.setOnDateChangeListener { view, year, month, day ->
             doctor?.let { doctor ->
-//                val date = "$year-$month-$dayOfMonth"
-                calendarViewModel.getAppointmentsTimes(doctor.id, view.date.toStringDate())
+                val stringDate = "$year-${month+1}-$day"
+                calendarViewModel.getAppointmentsTimes(doctor.id, stringDate)
             }
         }
     }
-
-//    private fun initFragmentViews(binding: FragmentCalendarBinding) {
-//        binding.calendar.minDate = System.currentTimeMillis()
-//        val currentTime = Calendar.getInstance().time
-//        logD("currentTime: $currentTime")
-//        binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
-//            logD("date: ${view.date}")
-////            logD("formatted date: ${month+1}/$dayOfMonth/$year")
-//            logD("formatted date: ${view.date.toStringDate()}")
-//
-//
-//        }
-//    }
 
     private fun viewModelConnect(binding: FragmentCalendarBinding) {
         calendarViewModel.appointmentsTimesResult.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             if (it.isSuccess) {
                 it.getOrNull()?.let { data ->
-                    logD("$data","AppointmentDataCheck")
                     appointmentDayConsumer.accept(Pair(data, binding))
                 }
             } else {
-                logE("${it.exceptionOrNull()?.message}", "AppointmentDataCheck")
                 adapter.clear()
                 binding.selectedDate.text = ""
             }
