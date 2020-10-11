@@ -97,7 +97,6 @@ class CalendarFragment: Fragment() {
 
         calendarViewModel.reserveAnAppointmentResult.observe(viewLifecycleOwner, Observer {
             if (it.isFailure) {
-                //TODO Разобраться почему приходит 403
                 showOkDialog(
                     requireActivity(),
                     R.string.an_appointment_request_failure_title,
