@@ -18,3 +18,14 @@ fun showDecisionDialog(activity: Activity,
         create().show()
     }
 }
+
+fun showOkDialog(activity: Activity, @StringRes title: Int, @StringRes text : Int, dismissAction: (() -> Unit)? = null) {
+    val builder = AlertDialog.Builder(activity)
+    builder.setTitle(title)
+    builder.setMessage(text)
+    builder.setPositiveButton(android.R.string.ok) { dialog, _ ->
+        dismissAction?.invoke()
+        dialog.dismiss()
+    }
+    builder.create().show()
+}

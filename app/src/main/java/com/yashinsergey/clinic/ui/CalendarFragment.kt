@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.yashinsergey.clinic.R
 import com.yashinsergey.clinic.common.showDecisionDialog
+import com.yashinsergey.clinic.common.showOkDialog
 import com.yashinsergey.clinic.databinding.FragmentCalendarBinding
 import com.yashinsergey.clinic.model.repos.network.json.AppointmentDay
 import com.yashinsergey.clinic.model.repos.network.json.Doctor
@@ -34,7 +36,6 @@ class CalendarFragment: Fragment() {
     val anAppointmentReserveRequest = PublishSubject.create<Int>()
 
     var doctor: Doctor? = null
-    private val doctorConsumer = Consumer<Doctor> { doctor = it }
 
     private val adapter : GroupAdapter<GroupieViewHolder> by lazy {
         val groupAdapter = GroupAdapter<GroupieViewHolder>()
@@ -42,12 +43,25 @@ class CalendarFragment: Fragment() {
         groupAdapter
     }
 
+    private val doctorConsumer = Consumer<Doctor> { doctor = it }
+
+    private val requestDialogConsumer = Consumer<Pair<Int, String>> {
+        showDecisionDialog(
+            requireActivity(),
+            R.string.dialog_request_an_appointment_title,
+            resources.getString(R.string.dialog_request_an_appointment_text).format(it.second),
+            R.string.dialog_positive_button_text,
+            R.string.dialog_cancel_button_text,
+            { calendarViewModel.reserveAnAppointment(it.first) }
+        )
+    }
+
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         lazyContainer.getValue(
             { FragmentCalendarBinding.inflate(inflater, container, false) },
             { initFragmentViews(it) }
         ).root
-
 
     @SuppressLint("CheckResult")
     private fun initFragmentViews(binding: FragmentCalendarBinding) {
@@ -70,7 +84,7 @@ class CalendarFragment: Fragment() {
     }
 
     private fun viewModelConnect(binding: FragmentCalendarBinding) {
-        calendarViewModel.appointmentsTimesResult.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        calendarViewModel.appointmentsTimesResult.observe(viewLifecycleOwner, Observer {
             if (it.isSuccess) {
                 it.getOrNull()?.let { data ->
                     appointmentDayConsumer.accept(Pair(data, binding))
@@ -78,6 +92,17 @@ class CalendarFragment: Fragment() {
             } else {
                 adapter.clear()
                 binding.selectedDate.text = ""
+            }
+        })
+
+        calendarViewModel.reserveAnAppointmentResult.observe(viewLifecycleOwner, Observer {
+            if (it.isFailure) {
+                //TODO Разобраться почему приходит 403
+                showOkDialog(
+                    requireActivity(),
+                    R.string.an_appointment_request_failure_title,
+                    R.string.an_appointment_request_failure_text,
+                    )
             }
         })
     }
@@ -94,16 +119,5 @@ class CalendarFragment: Fragment() {
             groups.add(AppointmentTimeItem(i.toLong(), reception, requestDialogConsumer))
         }
         return groups
-    }
-
-    private val requestDialogConsumer = Consumer<Pair<Int, String>> {
-        showDecisionDialog(
-            requireActivity(),
-            R.string.dialog_request_an_appointment_title,
-            resources.getString(R.string.dialog_request_an_appointment_text).format(it.second),
-            R.string.dialog_positive_button_text,
-            R.string.dialog_cancel_button_text,
-            { anAppointmentReserveRequest.onNext(it.first) }
-        )
     }
 }
