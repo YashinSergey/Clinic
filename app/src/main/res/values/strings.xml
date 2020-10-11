@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Clinic</string>
+
+    <string name="dialog_request_an_appointment_title">Запись к врачу</string>
+    <string name="dialog_request_an_appointment_text">Вы хотите записаться к врачу на %s?</string>
+    <string name="dialog_positive_button_text">Да</string>
+    <string name="dialog_cancel_button_text">Отмена</string>
 </resources>
