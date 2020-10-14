@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import com.yashinsergey.clinic.common.logD
-import com.yashinsergey.clinic.common.logE
-import com.yashinsergey.clinic.common.toStringDate
+import com.yashinsergey.clinic.R
+import com.yashinsergey.clinic.common.showDecisionDialog
+import com.yashinsergey.clinic.common.showOkDialog
 import com.yashinsergey.clinic.databinding.FragmentCalendarBinding
 import com.yashinsergey.clinic.model.repos.network.json.AppointmentDay
 import com.yashinsergey.clinic.model.repos.network.json.Doctor
@@ -23,7 +24,6 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
 
 class CalendarFragment: Fragment() {
 
@@ -33,21 +33,35 @@ class CalendarFragment: Fragment() {
     private val click = PublishSubject.create<ButtonId>()
 
     val doctorSubject = BehaviorSubject.create<Doctor>()
-    var doctor: Doctor? = null
-    val doctorConsumer = Consumer<Doctor> { doctor = it }
+    val anAppointmentReserveRequest = PublishSubject.create<Int>()
 
-    val adapter : GroupAdapter<GroupieViewHolder> by lazy {
+    var doctor: Doctor? = null
+
+    private val adapter : GroupAdapter<GroupieViewHolder> by lazy {
         val groupAdapter = GroupAdapter<GroupieViewHolder>()
         groupAdapter.setHasStableIds(true)
         groupAdapter
     }
+
+    private val doctorConsumer = Consumer<Doctor> { doctor = it }
+
+    private val requestDialogConsumer = Consumer<Pair<Int, String>> {
+        showDecisionDialog(
+            requireActivity(),
+            R.string.dialog_request_an_appointment_title,
+            resources.getString(R.string.dialog_request_an_appointment_text).format(it.second),
+            R.string.dialog_positive_button_text,
+            R.string.dialog_cancel_button_text,
+            { calendarViewModel.reserveAnAppointment(it.first) }
+        )
+    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         lazyContainer.getValue(
             { FragmentCalendarBinding.inflate(inflater, container, false) },
             { initFragmentViews(it) }
         ).root
-
 
     @SuppressLint("CheckResult")
     private fun initFragmentViews(binding: FragmentCalendarBinding) {
@@ -61,38 +75,33 @@ class CalendarFragment: Fragment() {
     @SuppressLint("SimpleDateFormat")
     private fun initCalendar(binding: FragmentCalendarBinding) {
         binding.calendar.minDate = System.currentTimeMillis()
-        binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
+        binding.calendar.setOnDateChangeListener { view, year, month, day ->
             doctor?.let { doctor ->
-//                val date = "$year-$month-$dayOfMonth"
-                calendarViewModel.getAppointmentsTimes(doctor.id, view.date.toStringDate())
+                val stringDate = "$year-${month+1}-$day"
+                calendarViewModel.getAppointmentsTimes(doctor.id, stringDate)
             }
         }
     }
 
-//    private fun initFragmentViews(binding: FragmentCalendarBinding) {
-//        binding.calendar.minDate = System.currentTimeMillis()
-//        val currentTime = Calendar.getInstance().time
-//        logD("currentTime: $currentTime")
-//        binding.calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
-//            logD("date: ${view.date}")
-////            logD("formatted date: ${month+1}/$dayOfMonth/$year")
-//            logD("formatted date: ${view.date.toStringDate()}")
-//
-//
-//        }
-//    }
-
     private fun viewModelConnect(binding: FragmentCalendarBinding) {
-        calendarViewModel.appointmentsTimesResult.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        calendarViewModel.appointmentsTimesResult.observe(viewLifecycleOwner, Observer {
             if (it.isSuccess) {
                 it.getOrNull()?.let { data ->
-                    logD("$data","AppointmentDataCheck")
                     appointmentDayConsumer.accept(Pair(data, binding))
                 }
             } else {
-                logE("${it.exceptionOrNull()?.message}", "AppointmentDataCheck")
                 adapter.clear()
                 binding.selectedDate.text = ""
+            }
+        })
+
+        calendarViewModel.reserveAnAppointmentResult.observe(viewLifecycleOwner, Observer {
+            if (it.isFailure) {
+                showOkDialog(
+                    requireActivity(),
+                    R.string.an_appointment_request_failure_title,
+                    R.string.an_appointment_request_failure_text,
+                    )
             }
         })
     }
@@ -106,7 +115,7 @@ class CalendarFragment: Fragment() {
     private fun createGroups(receptions: List<Receptions>): List<AppointmentTimeItem> {
         val groups = mutableListOf<AppointmentTimeItem>()
         receptions.forEachIndexed { i, reception ->
-            groups.add(AppointmentTimeItem(i.toLong(), reception))
+            groups.add(AppointmentTimeItem(i.toLong(), reception, requestDialogConsumer))
         }
         return groups
     }

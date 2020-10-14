@@ -36,11 +36,16 @@ val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ")
 @SuppressLint("SimpleDateFormat")
 val dateFormat2 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ")
 
+val dateFormat3 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
+
 @SuppressLint("SimpleDateFormat")
 val displayDateFormat = SimpleDateFormat("dd.MM.yyyy").apply { timeZone = TimeZone.getDefault() }
 
 @SuppressLint("SimpleDateFormat")
 val displayDateFormat2 = SimpleDateFormat("dd.MM.yy").apply { timeZone = TimeZone.getDefault() }
+
+@SuppressLint("SimpleDateFormat")
+val displayDateFormat3 = SimpleDateFormat("yyyy-MM-dd").apply { timeZone = TimeZone.getDefault() }
 
 @SuppressLint("SimpleDateFormat")
 val displayTimeFormat = SimpleDateFormat("HH:mm").apply { timeZone = TimeZone.getDefault() }
@@ -75,7 +80,7 @@ fun String.getDateOrNull(dateFormat: DateFormat): Date? {
 fun String.toRFC822(): String = if(this.length == 29 && this[26] == ':')
     "${this.subSequence(0, 26)}${this.subSequence(27, 29)}" else this
 
-fun Long.toStringDate(): String {
+fun Long.toStringDateTime(formatType: SimpleDateFormat): String {
     val date = Date(this)
-    return displayDateFormat.format(date)
+    return formatType.format(date)
 }

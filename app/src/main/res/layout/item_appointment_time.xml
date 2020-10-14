@@ -10,6 +10,7 @@
     <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/item_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -18,12 +19,13 @@
         android:layout_margin="10dp">
 
         <TextView
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:padding="10dp"
             android:textSize="18sp"
-            android:text="@{item.beginTime}"
+            android:text="@{item.getTime(item.beginTime)}"
             tools:text="15:38"/>
 
     </FrameLayout>
