@@ -18,7 +18,6 @@ class CalendarFragmentViewModel(private val receptionRepos: ReceptionRepository)
             appointmentsTimesResult
         )
 
-
     fun reserveAnAppointment(receptionId: Int) =
         launchInScope(
             { receptionRepos.reserveAnAppointment(receptionId) },

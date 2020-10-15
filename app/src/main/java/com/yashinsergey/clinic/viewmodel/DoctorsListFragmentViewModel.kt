@@ -8,8 +8,6 @@ import com.yashinsergey.clinic.model.repos.network.json.Doctor
 
 class DoctorsListFragmentViewModel(private val repos: DoctorsRepository): ViewModel() {
 
-
-
     val allDoctorListResult = MutableLiveData<Result<List<Doctor>>>()
     val doctorsByBranchResult = MutableLiveData<Result<List<Doctor>>>()
 
