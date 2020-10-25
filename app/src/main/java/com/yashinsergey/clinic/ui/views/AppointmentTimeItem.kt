@@ -17,8 +17,19 @@ class AppointmentTimeItem(
 
     override fun bind(viewBinding: ItemAppointmentTimeBinding, position: Int) {
         viewBinding.item = reception
-        viewBinding.itemLayout.setOnClickListener {
-            requestDialogConsumer.accept(Pair(reception.id, viewBinding.time.text.toString()))
+        initCell(viewBinding)
+    }
+
+    private fun initCell(viewBinding: ItemAppointmentTimeBinding) {
+        val itemLayout = viewBinding.itemLayout
+        itemLayout.isEnabled = !reception.ocupied
+        if (itemLayout.isEnabled) {
+            itemLayout.setBackgroundResource(R.drawable.bg_appointment_time)
+            itemLayout.setOnClickListener {
+                requestDialogConsumer.accept(Pair(reception.id, viewBinding.time.text.toString()))
+            }
+        } else {
+            itemLayout.setBackgroundResource(R.drawable.bg_primary_dark)
         }
     }
 }

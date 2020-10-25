@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.yashinsergey.clinic.R
+import com.yashinsergey.clinic.common.logD
 import com.yashinsergey.clinic.common.showDecisionDialog
 import com.yashinsergey.clinic.common.showOkDialog
 import com.yashinsergey.clinic.databinding.FragmentCalendarBinding
@@ -33,7 +34,6 @@ class CalendarFragment: Fragment() {
     private val click = PublishSubject.create<ButtonId>()
 
     val doctorSubject = BehaviorSubject.create<Doctor>()
-    val anAppointmentReserveRequest = PublishSubject.create<Int>()
 
     var doctor: Doctor? = null
 
@@ -115,6 +115,7 @@ class CalendarFragment: Fragment() {
     private fun createGroups(receptions: List<Receptions>): List<AppointmentTimeItem> {
         val groups = mutableListOf<AppointmentTimeItem>()
         receptions.forEachIndexed { i, reception ->
+            logD("${reception.getTime(reception.beginTime)} isOccupied: ${reception.ocupied}", "RECEPTION")
             groups.add(AppointmentTimeItem(i.toLong(), reception, requestDialogConsumer))
         }
         return groups
