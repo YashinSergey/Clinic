@@ -69,6 +69,8 @@ fun String.parseReadableDate(withTimeZone: Boolean, withDayTime: Boolean): Strin
 fun Date.getReadableDateOrTime(today: Boolean): String =
     (if(today) displayTimeFormat else displayDateFormat2).format(this)
 
+fun Date.getFormattedDate(dateFormat: SimpleDateFormat): String =
+    dateFormat.format(this)
 
 fun Date.getReadable(withDayTime: Boolean): String =
     (if(withDayTime) displayDateFormatDayTime else displayDateFormat).format(this)

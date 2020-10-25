@@ -11,9 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.yashinsergey.clinic.R
-import com.yashinsergey.clinic.common.logD
-import com.yashinsergey.clinic.common.showDecisionDialog
-import com.yashinsergey.clinic.common.showOkDialog
+import com.yashinsergey.clinic.common.*
 import com.yashinsergey.clinic.databinding.FragmentCalendarBinding
 import com.yashinsergey.clinic.model.repos.network.json.AppointmentDay
 import com.yashinsergey.clinic.model.repos.network.json.Doctor
@@ -25,12 +23,14 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 class CalendarFragment: Fragment() {
 
     private val calendarViewModel: CalendarFragmentViewModel by viewModel()
 
     private val lazyContainer = LazyContainer<FragmentCalendarBinding>()
+    private lateinit var binding: FragmentCalendarBinding
     private val click = PublishSubject.create<ButtonId>()
 
     val doctorSubject = BehaviorSubject.create<Doctor>()
@@ -65,11 +65,20 @@ class CalendarFragment: Fragment() {
 
     @SuppressLint("CheckResult")
     private fun initFragmentViews(binding: FragmentCalendarBinding) {
+        this.binding = binding
         initCalendar(binding)
         binding.timeRecyclerView.layoutManager = GridLayoutManager(context, 4)
         binding.timeRecyclerView.adapter = adapter
         doctorSubject.subscribe(doctorConsumer)
         viewModelConnect(binding)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        doctor?.let { doctor ->
+            val formattedDate = Date(binding.calendar.date).getFormattedDate(displayDateFormat3)
+            calendarViewModel.getAppointmentsTimes(doctor.id, formattedDate)
+        }
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -87,7 +96,7 @@ class CalendarFragment: Fragment() {
         calendarViewModel.appointmentsTimesResult.observe(viewLifecycleOwner, Observer {
             if (it.isSuccess) {
                 it.getOrNull()?.let { data ->
-                    appointmentDayConsumer.accept(Pair(data, binding))
+                    appointmentDayConsumer.accept(data)
                 }
             } else {
                 adapter.clear()
@@ -106,10 +115,10 @@ class CalendarFragment: Fragment() {
         })
     }
 
-    private val appointmentDayConsumer = Consumer<Pair<AppointmentDay, FragmentCalendarBinding>> {
+    private val appointmentDayConsumer = Consumer<AppointmentDay> {
         adapter.clear()
-        it.second.selectedDate.text = it.first.date
-        adapter.addAll(createGroups(it.first.receptions))
+        binding.selectedDate.text = it.date
+        adapter.addAll(createGroups(it.receptions))
     }
 
     private fun createGroups(receptions: List<Receptions>): List<AppointmentTimeItem> {
